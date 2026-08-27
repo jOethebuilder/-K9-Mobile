@@ -80,3 +80,22 @@ got its own real screen with save/test.
 every push to `main` — see the Actions tab after pushing. Download the
 `k9-mobile-debug-apk` artifact, unzip it, sideload `app-debug.apk` onto
 your phone.
+
+## App icon
+
+Launcher icon is done: silver logo (RGB 196,199,202) on the firmware's dark
+`C_BG` background (RGB 16,21,28 / `#10151C`).
+
+- Legacy square + round icons at all 5 densities (`mipmap-mdpi` through
+  `mipmap-xxxhdpi`) — `ic_launcher.png` / `ic_launcher_round.png`.
+- Adaptive icon foreground layers at all 5 densities
+  (`ic_launcher_foreground.png`), background supplied as a color resource
+  (`@color/ic_launcher_background` in `values/colors.xml`) rather than a
+  flat PNG, which is the standard/lighter-weight approach.
+- `mipmap-anydpi-v26/ic_launcher.xml` and `ic_launcher_round.xml` — the two
+  adaptive-icon XML files tying foreground+background together for API 26+.
+- `AndroidManifest.xml`'s `<application>` tag points at
+  `@mipmap/ic_launcher` / `@mipmap/ic_launcher_round`.
+- Reusable standalone assets (not referenced by any code yet, just sitting
+  in `assets/` for later use — e.g. an about screen):
+  `assets/k9_logo_silver_transparent.png`, `assets/k9_icon_512.png`.
