@@ -1,5 +1,7 @@
 package com.joethebuilder.k9.ui.screens.qidi
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,11 +30,12 @@ fun QidiScreen(viewModel: QidiViewModel, onBack: () -> Unit) {
             )
         }
     ) { padding ->
-        Column(
+                Column(
             modifier = Modifier
                 .padding(padding)
                 .padding(16.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             lastRead?.let { data ->
@@ -65,9 +68,9 @@ fun QidiScreen(viewModel: QidiViewModel, onBack: () -> Unit) {
                 items = QidiData.materialCodes,
                 selectedIndex = matIdx,
                 onSelect = viewModel::setMaterial,
-                label = { code -> QidiData.materialName(code) },
-                modifier = Modifier.weight(1f)
-            )
+                               label = { code -> QidiData.materialName(code) },
+                modifier = Modifier.height(220.dp)
+                        )
 
             Text("Color", style = MaterialTheme.typography.titleMedium)
             SelectableList(
@@ -75,8 +78,8 @@ fun QidiScreen(viewModel: QidiViewModel, onBack: () -> Unit) {
                 selectedIndex = colIdx - 1,
                 onSelect = { idx -> viewModel.setColor(idx + 1) },
                 label = { it.label },
-                swatch = { c -> ColorSwatch(c.r, c.g, c.b) },
-                modifier = Modifier.weight(1f)
+                               swatch = { c -> ColorSwatch(c.r, c.g, c.b) },
+                modifier = Modifier.height(220.dp)
             )
 
             val armed by remember { WriteArmState.armed }
