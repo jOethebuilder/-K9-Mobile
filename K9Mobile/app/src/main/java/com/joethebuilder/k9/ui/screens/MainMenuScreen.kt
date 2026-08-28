@@ -55,8 +55,11 @@ fun MainMenuScreen(
         Button(onClick = onSelectOpenSpool, modifier = Modifier.fillMaxWidth().height(56.dp)) {
             Text("OPENSPOOL U1")
         }
-        Button(onClick = onSelectAnycubic, modifier = Modifier.fillMaxWidth().height(56.dp)) {
+             Button(onClick = onSelectAnycubic, modifier = Modifier.fillMaxWidth().height(56.dp)) {
             Text("ANYCUBIC")
+        }
+        Button(onClick = onSelectSpoolman, modifier = Modifier.fillMaxWidth().height(56.dp)) {
+            Text("SPOOLMAN")
         }
         OutlinedButton(onClick = onSelectSettings, modifier = Modifier.fillMaxWidth().height(48.dp)) {
             Text("SETTINGS")
