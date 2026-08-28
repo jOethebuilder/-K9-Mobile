@@ -16,13 +16,18 @@ private val Context.dataStore by preferencesDataStore(name = "k9_settings")
  * still needed here).
  */
 class PrefsRepository(private val context: Context) {
-
     private val U1_HOST_KEY = stringPreferencesKey("u1_host")
+    private val QIDI_HOST_KEY = stringPreferencesKey("qidi_host")
 
     val u1Host: Flow<String> = context.dataStore.data.map { it[U1_HOST_KEY] ?: "" }
+    val qidiHost: Flow<String> = context.dataStore.data.map { it[QIDI_HOST_KEY] ?: "" }
 
     suspend fun saveU1Host(host: String) {
         context.dataStore.edit { it[U1_HOST_KEY] = host }
+    }
+
+    suspend fun saveQidiHost(host: String) {
+        context.dataStore.edit { it[QIDI_HOST_KEY] = host }
     }
 
     /** Port of firmware's SCR_FACTORY_CONFIRM -> prefs.clear() on both NVS namespaces. */
