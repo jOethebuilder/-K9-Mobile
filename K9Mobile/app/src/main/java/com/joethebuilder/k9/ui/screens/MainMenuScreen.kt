@@ -25,6 +25,7 @@ fun MainMenuScreen(
     onSelectQidi: () -> Unit,
     onSelectOpenSpool: () -> Unit,
     onSelectAnycubic: () -> Unit,
+    onSelectSpoolman: () -> Unit,
     onSelectSettings: () -> Unit
 ) {
     val context = LocalContext.current
