@@ -103,19 +103,26 @@ fun OpenSpoolEntryScreen(
                 )
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) { Text("BACK") }
+                     val btnPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(onClick = onBack, contentPadding = btnPadding, modifier = Modifier.weight(1f)) {
+                    Text("BACK", maxLines = 1, style = MaterialTheme.typography.labelMedium)
+                }
                 Button(
                     onClick = { viewModel.armWrite() },
                     enabled = !armed,
+                    contentPadding = btnPadding,
                     modifier = Modifier.weight(1f)
-                ) { Text(if (armed && !armedForRead) "…" else "SAVE") }
-                Button(onClick = onOpenSlotPicker, modifier = Modifier.weight(1f)) { Text("SEND") }
+                ) { Text(if (armed && !armedForRead) "…" else "SAVE", maxLines = 1, style = MaterialTheme.typography.labelMedium) }
+                Button(onClick = onOpenSlotPicker, contentPadding = btnPadding, modifier = Modifier.weight(1f)) {
+                    Text("SEND", maxLines = 1, style = MaterialTheme.typography.labelMedium)
+                }
                 OutlinedButton(
                     onClick = { viewModel.armEntryRead() },
                     enabled = !armed,
+                    contentPadding = btnPadding,
                     modifier = Modifier.weight(1f)
-                ) { Text(if (armed && armedForRead) "…" else "READ") }
+                ) { Text(if (armed && armedForRead) "…" else "READ", maxLines = 1, style = MaterialTheme.typography.labelMedium) }
             }
         }
     }
