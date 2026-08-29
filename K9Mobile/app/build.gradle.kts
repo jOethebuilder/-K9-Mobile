@@ -2,10 +2,15 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
-
 android {
     namespace = "com.joethebuilder.k9"
     compileSdk = 34
+
+    applicationVariants.all {
+        outputs.all {
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName = "K9Mobile.apk"
+        }
+    }
 
     defaultConfig {
         applicationId = "com.joethebuilder.k9"
@@ -14,7 +19,6 @@ android {
         versionCode = 1
         versionName = "0.1.0"
     }
-
     buildFeatures {
         compose = true
     }
@@ -30,7 +34,6 @@ android {
         freeCompilerArgs += listOf("-opt-in=androidx.compose.material3.ExperimentalMaterial3Api")
     }
 }
-
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2024.06.00"))
     implementation("androidx.compose.ui:ui")
@@ -39,12 +42,9 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-
     // Networking (Moonraker HTTP)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-
     // Persisted settings (replaces ESP32 Preferences/NVS)
     implementation("androidx.datastore:datastore-preferences:1.1.1")
-
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
