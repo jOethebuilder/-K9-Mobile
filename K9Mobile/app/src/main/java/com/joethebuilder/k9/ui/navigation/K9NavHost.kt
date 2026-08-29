@@ -26,6 +26,8 @@ import com.joethebuilder.k9.ui.screens.settings.FirmwareInfoScreen
 import com.joethebuilder.k9.ui.screens.settings.NfcStatusScreen
 import com.joethebuilder.k9.ui.screens.settings.SettingsMenuScreen
 import com.joethebuilder.k9.ui.screens.settings.U1ConnectionScreen
+import com.joethebuilder.k9.ui.screens.spoolman.SpoolmanSubMenuScreen
+import com.joethebuilder.k9.ui.screens.spoolman.FilamentManagerScreen
 import com.joethebuilder.k9.viewmodel.AnycubicViewModel
 import com.joethebuilder.k9.viewmodel.OpenSpoolViewModel
 import com.joethebuilder.k9.viewmodel.QidiViewModel
@@ -56,6 +58,9 @@ object Routes {
     const val ANYCUBIC_COLOR = "anycubic_color"
     const val ANYCUBIC_CUSTOM = "anycubic_custom"
 
+    const val SPOOLMAN_SUBMENU = "spoolman_submenu"
+    const val FILAMENT_MANAGER = "filament_manager"
+
     const val SETTINGS = "settings"
     const val SETTINGS_U1 = "settings_u1"
     const val SETTINGS_NFC_STATUS = "settings_nfc_status"
@@ -81,6 +86,7 @@ fun K9NavHost(
                 onSelectQidi = { navController.navigate(Routes.QIDI_SUBMENU) },
                 onSelectOpenSpool = { navController.navigate(Routes.OPENSPOOL_SUBMENU) },
                 onSelectAnycubic = { navController.navigate(Routes.ANYCUBIC_SUBMENU) },
+                onSelectSpoolman = { navController.navigate(Routes.SPOOLMAN_SUBMENU) },
                 onSelectSettings = { navController.navigate(Routes.SETTINGS) }
             )
         }
@@ -178,6 +184,17 @@ fun K9NavHost(
                 onBack = { navController.popBackStack() },
                 onSaved = { navController.popBackStack(Routes.ANYCUBIC_ENTRY, inclusive = false) }
             )
+        }
+
+        // ---- Spoolman ----
+        composable(Routes.SPOOLMAN_SUBMENU) {
+            SpoolmanSubMenuScreen(
+                onBack = { navController.popBackStack(Routes.MAIN, inclusive = false) },
+                onOpenFilamentManager = { navController.navigate(Routes.FILAMENT_MANAGER) }
+            )
+        }
+        composable(Routes.FILAMENT_MANAGER) {
+            FilamentManagerScreen(onBack = { navController.popBackStack() })
         }
 
         // ---- Settings ----
