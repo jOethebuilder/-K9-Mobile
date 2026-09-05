@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.joethebuilder.k9.network.PrefsRepository
-import com.joethebuilder.k9.network.QidiHappyHareAdapter
+import com.joethebuilder.k9.network.QidiBoxSpoolmanAdapter
 import com.joethebuilder.k9.network.SlotAssignment
 import com.joethebuilder.k9.network.SlotSpoolAdapter
 import com.joethebuilder.k9.network.SpoolInfo
