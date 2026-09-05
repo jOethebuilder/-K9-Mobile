@@ -49,9 +49,9 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
             val host = u1Host.ifBlank { "192.168.1.19" }
             U1AfcAdapter(moonrakerBaseUrl = "http://$host:7125")
         }
-        PrinterTab.QIDI -> {
+             PrinterTab.QIDI -> {
             if (qidiHost.isBlank()) null
-            else QidiHappyHareAdapter(moonrakerBaseUrl = "http://$qidiHost:7125")
+            else QidiHappyHareAdapter(moonrakerBaseUrl = "http://$qidiHost")
         }
     }
 
