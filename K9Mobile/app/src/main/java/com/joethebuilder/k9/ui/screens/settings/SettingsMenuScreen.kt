@@ -26,6 +26,7 @@ fun SettingsMenuScreen(
     prefs: PrefsRepository,
     onBack: () -> Unit,
     onOpenU1Connection: () -> Unit,
+    onOpenQidiConnection: () -> Unit,
     onOpenNfcStatus: () -> Unit,
     onOpenFirmwareInfo: () -> Unit,
     onFactoryResetDone: () -> Unit
