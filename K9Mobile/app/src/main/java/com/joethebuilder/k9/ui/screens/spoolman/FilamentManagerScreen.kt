@@ -1,14 +1,15 @@
 package com.joethebuilder.k9.ui.screens.spoolman
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.joethebuilder.k9.network.PrefsRepository
 import com.joethebuilder.k9.network.QidiBoxSpoolmanAdapter
 import com.joethebuilder.k9.network.SlotAssignment
@@ -45,6 +47,7 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
     var slots by remember { mutableStateOf<List<SlotAssignment>>(emptyList()) }
     var spools by remember { mutableStateOf<List<SpoolInfo>>(emptyList()) }
     var loading by remember { mutableStateOf(false) }
+    var connected by remember { mutableStateOf(false) }
     var errorMsg by remember { mutableStateOf<String?>(null) }
     var pickerSlot by remember { mutableStateOf<Int?>(null) }
 
@@ -64,6 +67,7 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
         if (adapter == null) {
             errorMsg = "QIDI host not set — add it in Settings"
             slots = emptyList()
+            connected = false
             return
         }
         loading = true
@@ -77,7 +81,18 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
             slots = result.first
             spools = result.second
             loading = false
+            connected = result.first.isNotEmpty()
             if (result.first.isEmpty()) errorMsg = "Couldn't read slots — check printer is on and connected"
+        }
+    }
+
+    fun clearSlot(slot: Int) {
+        val adapter = currentAdapter() ?: return
+        scope.launch {
+            val ok = withContext(Dispatchers.IO) {
+                try { adapter.assignSpool(slot, 0) } catch (e: Exception) { false }
+            }
+            if (ok) refresh() else errorMsg = "Reset failed — check printer connection"
         }
     }
 
@@ -91,9 +106,22 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Filament manager", style = MaterialTheme.typography.headlineMedium)
-            IconButton(onClick = { refresh() }) {
-                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+            Text("Filament Manager", style = MaterialTheme.typography.headlineMedium)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.Refresh,
+                    contentDescription = null,
+                    tint = if (connected) Color(0xFF2E7D32) else MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    if (connected) "Connected" else "Not connected",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (connected) Color(0xFF2E7D32) else MaterialTheme.colorScheme.outline
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Button(onClick = { refresh() }) { Text("Read spool tags") }
             }
         }
 
@@ -130,7 +158,9 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
                         SlotCard(
                             slotIndex = slot.slot,
                             spool = spool,
-                            onClick = { pickerSlot = slot.slot }
+                            onAssign = { pickerSlot = slot.slot },
+                            onRefresh = { refresh() },
+                            onReset = { clearSlot(slot.slot) }
                         )
                     }
                 }
@@ -166,24 +196,88 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
 }
 
 @Composable
-private fun SlotCard(slotIndex: Int, spool: SpoolInfo?, onClick: () -> Unit) {
-    ElevatedCard(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth().height(120.dp)
+private fun Badge(text: String, color: Color) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(color.copy(alpha = 0.15f))
+            .padding(horizontal = 6.dp, vertical = 2.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(12.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Slot ${slotIndex + 1}", style = MaterialTheme.typography.labelLarge)
+        Text(text, style = MaterialTheme.typography.labelSmall, color = color, fontSize = 10.sp)
+    }
+}
+
+@Composable
+private fun SlotCard(
+    slotIndex: Int,
+    spool: SpoolInfo?,
+    onAssign: () -> Unit,
+    onRefresh: () -> Unit,
+    onReset: () -> Unit
+) {
+    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Slot ${slotIndex + 1}", style = MaterialTheme.typography.titleMedium)
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Badge("OFFICIAL", Color(0xFFE65100))
+                    Badge("SPOOLMAN", Color(0xFF6A1B9A))
+                    Badge(if (spool != null) "ASSIGNED" else "EMPTY", if (spool != null) Color(0xFF2E7D32) else MaterialTheme.colorScheme.outline)
+                }
+            }
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
             if (spool != null) {
-                Text(spool.name, style = MaterialTheme.typography.bodyLarge)
-                Text("${spool.material} · ${spool.remainingWeight.toInt()} g left", style = MaterialTheme.typography.bodySmall)
+                LabelValueRow("Material", spool.name)
+                LabelValueRow("Spool ID", "#${spool.id}")
+                LabelValueRow("Remaining", "${spool.remainingWeight.toInt()} g", valueColor = Color(0xFF2E7D32))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Color", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline, modifier = Modifier.width(80.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(14.dp)
+                            .clip(CircleShape)
+                            .background(parseSwatchColor(spool.color))
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("#${spool.color}", style = MaterialTheme.typography.bodySmall)
+                }
+                LabelValueRow("Card UID", "N/A")
             } else {
                 Text("Empty", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.outline)
-                Text("Tap to assign", style = MaterialTheme.typography.bodySmall)
+                Text("Tap Spool below to assign", style = MaterialTheme.typography.bodySmall)
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                OutlinedButton(onClick = onRefresh, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                    Text("Refresh", style = MaterialTheme.typography.labelSmall)
+                }
+                OutlinedButton(onClick = { /* manual entry not built yet */ }, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                    Text("User", style = MaterialTheme.typography.labelSmall)
+                }
+                OutlinedButton(onClick = onReset, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                    Text("Reset", style = MaterialTheme.typography.labelSmall)
+                }
+                Button(onClick = onAssign, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                    Text("Spool", style = MaterialTheme.typography.labelSmall)
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun LabelValueRow(label: String, value: String, valueColor: Color = Color.Unspecified) {
+    Row {
+        Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline, modifier = Modifier.width(80.dp))
+        Text(value, style = MaterialTheme.typography.bodyMedium, color = valueColor)
     }
 }
 
