@@ -55,6 +55,9 @@ fun SettingsMenuScreen(
             OutlinedButton(onClick = onOpenU1Connection, modifier = Modifier.fillMaxWidth()) {
                 Text("U1 CONNECTION")
             }
+            OutlinedButton(onClick = onOpenQidiConnection, modifier = Modifier.fillMaxWidth()) {
+                Text("QIDI CONNECTION")
+            }
             OutlinedButton(onClick = onOpenNfcStatus, modifier = Modifier.fillMaxWidth()) {
                 Text("NFC STATUS")
             }
