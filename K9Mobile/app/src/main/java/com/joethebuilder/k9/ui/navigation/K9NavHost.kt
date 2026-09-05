@@ -26,6 +26,7 @@ import com.joethebuilder.k9.ui.screens.settings.FirmwareInfoScreen
 import com.joethebuilder.k9.ui.screens.settings.NfcStatusScreen
 import com.joethebuilder.k9.ui.screens.settings.SettingsMenuScreen
 import com.joethebuilder.k9.ui.screens.settings.U1ConnectionScreen
+import com.joethebuilder.k9.ui.screens.settings.QidiConnectionScreen
 import com.joethebuilder.k9.ui.screens.spoolman.SpoolmanSubMenuScreen
 import com.joethebuilder.k9.ui.screens.spoolman.FilamentManagerScreen
 import com.joethebuilder.k9.viewmodel.AnycubicViewModel
@@ -63,6 +64,7 @@ object Routes {
 
     const val SETTINGS = "settings"
     const val SETTINGS_U1 = "settings_u1"
+    const val SETTINGS_QIDI = "settings_qidi"
     const val SETTINGS_NFC_STATUS = "settings_nfc_status"
     const val SETTINGS_APP_INFO = "settings_app_info"
 
@@ -198,11 +200,12 @@ fun K9NavHost(
         }
 
         // ---- Settings ----
-        composable(Routes.SETTINGS) {
+              composable(Routes.SETTINGS) {
             SettingsMenuScreen(
                 prefs = prefs,
                 onBack = { navController.popBackStack(Routes.MAIN, inclusive = false) },
                 onOpenU1Connection = { navController.navigate(Routes.SETTINGS_U1) },
+                onOpenQidiConnection = { navController.navigate(Routes.SETTINGS_QIDI) },
                 onOpenNfcStatus = { navController.navigate(Routes.SETTINGS_NFC_STATUS) },
                 onOpenFirmwareInfo = { navController.navigate(Routes.SETTINGS_APP_INFO) },
                 onFactoryResetDone = { navController.popBackStack(Routes.MAIN, inclusive = false) }
@@ -210,6 +213,9 @@ fun K9NavHost(
         }
         composable(Routes.SETTINGS_U1) {
             U1ConnectionScreen(openSpoolViewModel, onBack = { navController.popBackStack() })
+        }
+        composable(Routes.SETTINGS_QIDI) {
+            QidiConnectionScreen(prefs, onBack = { navController.popBackStack() })
         }
         composable(Routes.SETTINGS_NFC_STATUS) {
             NfcStatusScreen(onBack = { navController.popBackStack() })
