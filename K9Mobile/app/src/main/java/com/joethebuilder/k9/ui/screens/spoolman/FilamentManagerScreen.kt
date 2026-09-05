@@ -50,9 +50,8 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
             U1AfcAdapter(moonrakerBaseUrl = "http://$host:7125")
         }
              PrinterTab.QIDI -> {
-            if (qidiHost.isBlank()) null
-            else QidiHappyHareAdapter(moonrakerBaseUrl = "http://$qidiHost")
-        }
+                    if (qidiHost.isBlank()) null
+            else QidiBoxSpoolmanAdapter(moonrakerBaseUrl = "http://$qidiHost")
     }
 
     fun refresh() {
