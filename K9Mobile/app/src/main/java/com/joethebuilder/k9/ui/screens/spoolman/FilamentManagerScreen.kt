@@ -2,17 +2,21 @@ package com.joethebuilder.k9.ui.screens.spoolman
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.joethebuilder.k9.network.PrefsRepository
@@ -49,9 +53,10 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
             val host = u1Host.ifBlank { "192.168.1.19" }
             U1AfcAdapter(moonrakerBaseUrl = "http://$host:7125")
         }
-             PrinterTab.QIDI -> {
-                    if (qidiHost.isBlank()) null
+        PrinterTab.QIDI -> {
+            if (qidiHost.isBlank()) null
             else QidiBoxSpoolmanAdapter(moonrakerBaseUrl = "http://$qidiHost")
+        }
     }
 
     fun refresh() {
@@ -171,7 +176,7 @@ private fun SlotCard(slotIndex: Int, spool: SpoolInfo?, onClick: () -> Unit) {
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text("Slot ${slotIndex + 1}", style = MaterialTheme.typography.labelLarge)
-                       if (spool != null) {
+            if (spool != null) {
                 Text(spool.name, style = MaterialTheme.typography.bodyLarge)
                 Text("${spool.material} · ${spool.remainingWeight.toInt()} g left", style = MaterialTheme.typography.bodySmall)
             } else {
@@ -179,6 +184,14 @@ private fun SlotCard(slotIndex: Int, spool: SpoolInfo?, onClick: () -> Unit) {
                 Text("Tap to assign", style = MaterialTheme.typography.bodySmall)
             }
         }
+    }
+}
+
+private fun parseSwatchColor(hex: String): Color {
+    return try {
+        Color(android.graphics.Color.parseColor("#$hex"))
+    } catch (e: Exception) {
+        Color.Gray
     }
 }
 
@@ -197,8 +210,16 @@ private fun SpoolPickerSheet(
                 Text("No spools found in Spoolman")
             } else {
                 LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp)) {
-                                       items(spools) { spool ->
+                    items(spools) { spool ->
                         ListItem(
+                            leadingContent = {
+                                Box(
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clip(CircleShape)
+                                        .background(parseSwatchColor(spool.color))
+                                )
+                            },
                             headlineContent = { Text(spool.name) },
                             supportingContent = { Text("${spool.material} · ${spool.remainingWeight.toInt()} g remaining") },
                             modifier = Modifier.clickable { onPick(spool.id) }
