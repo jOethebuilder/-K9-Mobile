@@ -172,9 +172,9 @@ private fun SlotCard(slotIndex: Int, spool: SpoolInfo?, onClick: () -> Unit) {
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text("Slot ${slotIndex + 1}", style = MaterialTheme.typography.labelLarge)
-            if (spool != null) {
-                Text(spool.material, style = MaterialTheme.typography.bodyLarge)
-                Text("${spool.remainingWeight.toInt()} g left", style = MaterialTheme.typography.bodySmall)
+                       if (spool != null) {
+                Text(spool.name, style = MaterialTheme.typography.bodyLarge)
+                Text("${spool.material} · ${spool.remainingWeight.toInt()} g left", style = MaterialTheme.typography.bodySmall)
             } else {
                 Text("Empty", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.outline)
                 Text("Tap to assign", style = MaterialTheme.typography.bodySmall)
@@ -198,10 +198,10 @@ private fun SpoolPickerSheet(
                 Text("No spools found in Spoolman")
             } else {
                 LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp)) {
-                    items(spools) { spool ->
+                                       items(spools) { spool ->
                         ListItem(
-                            headlineContent = { Text(spool.material) },
-                            supportingContent = { Text("${spool.remainingWeight.toInt()} g remaining") },
+                            headlineContent = { Text(spool.name) },
+                            supportingContent = { Text("${spool.material} · ${spool.remainingWeight.toInt()} g remaining") },
                             modifier = Modifier.clickable { onPick(spool.id) }
                         )
                         HorizontalDivider()
