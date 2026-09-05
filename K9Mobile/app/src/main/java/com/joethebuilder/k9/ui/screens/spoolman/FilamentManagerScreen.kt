@@ -100,19 +100,19 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
         refresh()
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().padding(10.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Filament Manager", style = MaterialTheme.typography.headlineMedium)
+            Text("Filament Manager", style = MaterialTheme.typography.titleLarge)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     Icons.Default.Refresh,
                     contentDescription = null,
                     tint = if (connected) Color(0xFF2E7D32) else MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(14.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
@@ -120,27 +120,39 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
                     style = MaterialTheme.typography.bodySmall,
                     color = if (connected) Color(0xFF2E7D32) else MaterialTheme.colorScheme.outline
                 )
-                Spacer(modifier = Modifier.width(12.dp))
-                Button(onClick = { refresh() }) { Text("Read spool tags") }
+                Spacer(modifier = Modifier.width(10.dp))
+                Button(
+                    onClick = { refresh() },
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                ) { Text("Read spool tags", style = MaterialTheme.typography.labelMedium) }
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
-        TabRow(selectedTabIndex = selectedTab.ordinal) {
-            Tab(
-                selected = selectedTab == PrinterTab.U1,
-                onClick = { selectedTab = PrinterTab.U1 },
-                text = { Text("U1") }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Viewing: ${if (selectedTab == PrinterTab.U1) "U1" else "QIDI"}",
+                style = MaterialTheme.typography.titleMedium
             )
-            Tab(
-                selected = selectedTab == PrinterTab.QIDI,
-                onClick = { selectedTab = PrinterTab.QIDI },
-                text = { Text("QIDI") }
-            )
+            OutlinedButton(
+                onClick = {
+                    selectedTab = if (selectedTab == PrinterTab.U1) PrinterTab.QIDI else PrinterTab.U1
+                },
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    "Switch to ${if (selectedTab == PrinterTab.U1) "QIDI" else "U1"}",
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Box(modifier = Modifier.weight(1f)) {
             when {
@@ -150,8 +162,8 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
                 errorMsg != null -> Text(errorMsg ?: "", color = MaterialTheme.colorScheme.error)
                 else -> LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(slots) { slot ->
                         val spool = slot.spoolId?.let { id -> spools.firstOrNull { it.id == id } }
@@ -167,11 +179,6 @@ fun FilamentManagerScreen(onBack: () -> Unit) {
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth().height(48.dp)) {
-            Text("BACK")
-        }
     }
 
     val pickerSlotValue = pickerSlot
@@ -201,9 +208,9 @@ private fun Badge(text: String, color: Color) {
         modifier = Modifier
             .clip(RoundedCornerShape(4.dp))
             .background(color.copy(alpha = 0.15f))
-            .padding(horizontal = 6.dp, vertical = 2.dp)
+            .padding(horizontal = 5.dp, vertical = 1.dp)
     ) {
-        Text(text, style = MaterialTheme.typography.labelSmall, color = color, fontSize = 10.sp)
+        Text(text, style = MaterialTheme.typography.labelSmall, color = color, fontSize = 9.sp)
     }
 }
 
@@ -216,31 +223,31 @@ private fun SlotCard(
     onReset: () -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Slot ${slotIndex + 1}", style = MaterialTheme.typography.titleMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("Slot ${slotIndex + 1}", style = MaterialTheme.typography.titleSmall)
+                Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                     Badge("OFFICIAL", Color(0xFFE65100))
                     Badge("SPOOLMAN", Color(0xFF6A1B9A))
                     Badge(if (spool != null) "ASSIGNED" else "EMPTY", if (spool != null) Color(0xFF2E7D32) else MaterialTheme.colorScheme.outline)
                 }
             }
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             if (spool != null) {
                 LabelValueRow("Material", spool.name)
                 LabelValueRow("Spool ID", "#${spool.id}")
                 LabelValueRow("Remaining", "${spool.remainingWeight.toInt()} g", valueColor = Color(0xFF2E7D32))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Color", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline, modifier = Modifier.width(80.dp))
+                    Text("Color", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline, modifier = Modifier.width(70.dp))
                     Box(
                         modifier = Modifier
-                            .size(14.dp)
+                            .size(12.dp)
                             .clip(CircleShape)
                             .background(parseSwatchColor(spool.color))
                     )
@@ -249,24 +256,24 @@ private fun SlotCard(
                 }
                 LabelValueRow("Card UID", "N/A")
             } else {
-                Text("Empty", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.outline)
+                Text("Empty", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.outline)
                 Text("Tap Spool below to assign", style = MaterialTheme.typography.bodySmall)
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                OutlinedButton(onClick = onRefresh, contentPadding = PaddingValues(horizontal = 8.dp)) {
-                    Text("Refresh", style = MaterialTheme.typography.labelSmall)
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                OutlinedButton(onClick = onRefresh, contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp)) {
+                    Text("Refresh", style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
                 }
-                OutlinedButton(onClick = { /* manual entry not built yet */ }, contentPadding = PaddingValues(horizontal = 8.dp)) {
-                    Text("User", style = MaterialTheme.typography.labelSmall)
+                OutlinedButton(onClick = { /* manual entry not built yet */ }, contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp)) {
+                    Text("User", style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
                 }
-                OutlinedButton(onClick = onReset, contentPadding = PaddingValues(horizontal = 8.dp)) {
-                    Text("Reset", style = MaterialTheme.typography.labelSmall)
+                OutlinedButton(onClick = onReset, contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp)) {
+                    Text("Reset", style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
                 }
-                Button(onClick = onAssign, contentPadding = PaddingValues(horizontal = 8.dp)) {
-                    Text("Spool", style = MaterialTheme.typography.labelSmall)
+                Button(onClick = onAssign, contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp)) {
+                    Text("Spool", style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
                 }
             }
         }
@@ -276,8 +283,8 @@ private fun SlotCard(
 @Composable
 private fun LabelValueRow(label: String, value: String, valueColor: Color = Color.Unspecified) {
     Row {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline, modifier = Modifier.width(80.dp))
-        Text(value, style = MaterialTheme.typography.bodyMedium, color = valueColor)
+        Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline, modifier = Modifier.width(70.dp))
+        Text(value, style = MaterialTheme.typography.bodySmall, color = valueColor)
     }
 }
 
