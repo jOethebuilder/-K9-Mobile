@@ -25,6 +25,7 @@ fun MainMenuScreen(
     onSelectQidi: () -> Unit,
     onSelectOpenSpool: () -> Unit,
     onSelectAnycubic: () -> Unit,
+    onSelectBambu: () -> Unit,
     onSelectSpoolman: () -> Unit,
     onSelectSettings: () -> Unit
 ) {
@@ -58,6 +59,9 @@ fun MainMenuScreen(
              Button(onClick = onSelectAnycubic, modifier = Modifier.fillMaxWidth().height(56.dp)) {
             Text("ANYCUBIC")
         }
+             Button(onClick = onSelectBambu, modifier = Modifier.fillMaxWidth().height(56.dp)) {
+    Text("BAMBU OPENSPOOL")
+}
         Button(onClick = onSelectSpoolman, modifier = Modifier.fillMaxWidth().height(56.dp)) {
             Text("SPOOLMAN")
         }
