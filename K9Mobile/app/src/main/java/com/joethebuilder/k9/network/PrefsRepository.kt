@@ -18,6 +18,17 @@ private val Context.dataStore by preferencesDataStore(name = "k9_settings")
 class PrefsRepository(private val context: Context) {
     private val U1_HOST_KEY = stringPreferencesKey("u1_host")
     private val QIDI_HOST_KEY = stringPreferencesKey("qidi_host")
+    private val BAMBU_HOST_KEY = stringPreferencesKey("bambu_host")
+    private val BAMBU_SERIAL_KEY = stringPreferencesKey("bambu_serial")
+    private val BAMBU_ACCESS_CODE_KEY = stringPreferencesKey("bambu_access_code")
+
+val bambuHost: Flow<String> = context.dataStore.data.map { it[BAMBU_HOST_KEY] ?: "" }
+val bambuSerial: Flow<String> = context.dataStore.data.map { it[BAMBU_SERIAL_KEY] ?: "" }
+val bambuAccessCode: Flow<String> = context.dataStore.data.map { it[BAMBU_ACCESS_CODE_KEY] ?: "" }
+
+suspend fun saveBambuHost(host: String) { context.dataStore.edit { it[BAMBU_HOST_KEY] = host } }
+suspend fun saveBambuSerial(serial: String) { context.dataStore.edit { it[BAMBU_SERIAL_KEY] = serial } }
+suspend fun saveBambuAccessCode(code: String) { context.dataStore.edit { it[BAMBU_ACCESS_CODE_KEY] = code } }
 
     val u1Host: Flow<String> = context.dataStore.data.map { it[U1_HOST_KEY] ?: "" }
     val qidiHost: Flow<String> = context.dataStore.data.map { it[QIDI_HOST_KEY] ?: "" }
