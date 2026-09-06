@@ -20,6 +20,9 @@ import kotlinx.coroutines.launch
  * WIFI opens Android's own system WiFi settings instead of rebuilding the
  * firmware's on-screen SSID/password keyboard, since the phone already
  * manages its own WiFi at the OS level (see project notes).
+ *
+ * BAMBU CONNECTION and HELP added beyond the firmware's original menu —
+ * no firmware equivalent for either.
  */
 @Composable
 fun SettingsMenuScreen(
@@ -27,14 +30,15 @@ fun SettingsMenuScreen(
     onBack: () -> Unit,
     onOpenU1Connection: () -> Unit,
     onOpenQidiConnection: () -> Unit,
+    onOpenBambuConnection: () -> Unit,
     onOpenNfcStatus: () -> Unit,
     onOpenFirmwareInfo: () -> Unit,
+    onOpenHelp: () -> Unit,
     onFactoryResetDone: () -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showResetConfirm by remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -51,18 +55,23 @@ fun SettingsMenuScreen(
                 onClick = { context.startActivity(Intent(AndroidSettings.ACTION_WIFI_SETTINGS)) },
                 modifier = Modifier.fillMaxWidth()
             ) { Text("WIFI") }
-
             OutlinedButton(onClick = onOpenU1Connection, modifier = Modifier.fillMaxWidth()) {
                 Text("U1 CONNECTION")
             }
             OutlinedButton(onClick = onOpenQidiConnection, modifier = Modifier.fillMaxWidth()) {
                 Text("QIDI CONNECTION")
             }
+            OutlinedButton(onClick = onOpenBambuConnection, modifier = Modifier.fillMaxWidth()) {
+                Text("BAMBU CONNECTION")
+            }
             OutlinedButton(onClick = onOpenNfcStatus, modifier = Modifier.fillMaxWidth()) {
                 Text("NFC STATUS")
             }
             OutlinedButton(onClick = onOpenFirmwareInfo, modifier = Modifier.fillMaxWidth()) {
                 Text("APP INFO")
+            }
+            OutlinedButton(onClick = onOpenHelp, modifier = Modifier.fillMaxWidth()) {
+                Text("HELP")
             }
             OutlinedButton(
                 onClick = { showResetConfirm = true },
@@ -71,7 +80,6 @@ fun SettingsMenuScreen(
             ) { Text("FACTORY RESET") }
         }
     }
-
     if (showResetConfirm) {
         AlertDialog(
             onDismissRequest = { showResetConfirm = false },
