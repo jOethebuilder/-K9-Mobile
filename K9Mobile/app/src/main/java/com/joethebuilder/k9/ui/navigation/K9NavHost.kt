@@ -11,6 +11,12 @@ import com.joethebuilder.k9.ui.screens.anycubic.AnycubicCustomColorScreen
 import com.joethebuilder.k9.ui.screens.anycubic.AnycubicEntryScreen
 import com.joethebuilder.k9.ui.screens.anycubic.AnycubicMaterialPickerScreen
 import com.joethebuilder.k9.ui.screens.anycubic.AnycubicSubMenuScreen
+import com.joethebuilder.k9.ui.screens.bambu.BambuColorPickerScreen
+import com.joethebuilder.k9.ui.screens.bambu.BambuEntryScreen
+import com.joethebuilder.k9.ui.screens.bambu.BambuManufacturerPickerScreen
+import com.joethebuilder.k9.ui.screens.bambu.BambuMaterialPickerScreen
+import com.joethebuilder.k9.ui.screens.bambu.BambuSubMenuScreen
+import com.joethebuilder.k9.ui.screens.bambu.BambuSubtypePickerScreen
 import com.joethebuilder.k9.ui.screens.openspool.OpenSpoolColorPickerScreen
 import com.joethebuilder.k9.ui.screens.openspool.OpenSpoolEntryScreen
 import com.joethebuilder.k9.ui.screens.openspool.OpenSpoolManufacturerPickerScreen
@@ -22,6 +28,7 @@ import com.joethebuilder.k9.ui.screens.qidi.QidiColorPickerScreen
 import com.joethebuilder.k9.ui.screens.qidi.QidiEntryScreen
 import com.joethebuilder.k9.ui.screens.qidi.QidiMaterialPickerScreen
 import com.joethebuilder.k9.ui.screens.qidi.QidiSubMenuScreen
+import com.joethebuilder.k9.ui.screens.settings.BambuConnectionScreen
 import com.joethebuilder.k9.ui.screens.settings.FirmwareInfoScreen
 import com.joethebuilder.k9.ui.screens.settings.NfcStatusScreen
 import com.joethebuilder.k9.ui.screens.settings.SettingsMenuScreen
@@ -30,12 +37,15 @@ import com.joethebuilder.k9.ui.screens.settings.QidiConnectionScreen
 import com.joethebuilder.k9.ui.screens.spoolman.SpoolmanSubMenuScreen
 import com.joethebuilder.k9.ui.screens.spoolman.FilamentManagerScreen
 import com.joethebuilder.k9.viewmodel.AnycubicViewModel
+import com.joethebuilder.k9.viewmodel.BambuViewModel
 import com.joethebuilder.k9.viewmodel.OpenSpoolViewModel
 import com.joethebuilder.k9.viewmodel.QidiViewModel
 
 /**
  * Full route graph mirroring the firmware's Screen enum (minus screensaver,
- * backlight, touch calibration, splash — no phone equivalent, see README).
+ * backlight, touch calibration, splash — no phone equivalent, see README),
+ * plus Bambu OpenSpool (no firmware equivalent — new addition following
+ * the OpenSpool U1 pattern exactly).
  */
 object Routes {
     const val MAIN = "main"
@@ -59,18 +69,26 @@ object Routes {
     const val ANYCUBIC_COLOR = "anycubic_color"
     const val ANYCUBIC_CUSTOM = "anycubic_custom"
 
+    const val BAMBU_SUBMENU = "bambu_submenu"
+    const val BAMBU_ENTRY = "bambu_entry"
+    const val BAMBU_MANUFACTURER = "bambu_manufacturer"
+    const val BAMBU_MATERIAL = "bambu_material"
+    const val BAMBU_SUBTYPE = "bambu_subtype"
+    const val BAMBU_COLOR = "bambu_color"
+
     const val SPOOLMAN_SUBMENU = "spoolman_submenu"
     const val FILAMENT_MANAGER = "filament_manager"
 
     const val SETTINGS = "settings"
     const val SETTINGS_U1 = "settings_u1"
     const val SETTINGS_QIDI = "settings_qidi"
+    const val SETTINGS_BAMBU = "settings_bambu"
     const val SETTINGS_NFC_STATUS = "settings_nfc_status"
     const val SETTINGS_APP_INFO = "settings_app_info"
 
     /** Sub-menu routes are where MainActivity should engage per-protocol auto-scan. */
     val QIDI_MODE_ROUTES = setOf(QIDI_SUBMENU)
-    val NTAG_MODE_ROUTES = setOf(OPENSPOOL_SUBMENU, ANYCUBIC_SUBMENU)
+    val NTAG_MODE_ROUTES = setOf(OPENSPOOL_SUBMENU, ANYCUBIC_SUBMENU, BAMBU_SUBMENU)
 }
 
 @Composable
@@ -79,6 +97,7 @@ fun K9NavHost(
     qidiViewModel: QidiViewModel,
     openSpoolViewModel: OpenSpoolViewModel,
     anycubicViewModel: AnycubicViewModel,
+    bambuViewModel: BambuViewModel,
     prefs: PrefsRepository
 ) {
     NavHost(navController = navController, startDestination = Routes.MAIN) {
@@ -88,6 +107,7 @@ fun K9NavHost(
                 onSelectQidi = { navController.navigate(Routes.QIDI_SUBMENU) },
                 onSelectOpenSpool = { navController.navigate(Routes.OPENSPOOL_SUBMENU) },
                 onSelectAnycubic = { navController.navigate(Routes.ANYCUBIC_SUBMENU) },
+                onSelectBambu = { navController.navigate(Routes.BAMBU_SUBMENU) },
                 onSelectSpoolman = { navController.navigate(Routes.SPOOLMAN_SUBMENU) },
                 onSelectSettings = { navController.navigate(Routes.SETTINGS) }
             )
@@ -188,6 +208,40 @@ fun K9NavHost(
             )
         }
 
+        // ---- Bambu OpenSpool (new — no firmware equivalent, mirrors OpenSpool U1) ----
+        composable(Routes.BAMBU_SUBMENU) {
+            BambuSubMenuScreen(
+                viewModel = bambuViewModel,
+                onBack = { navController.popBackStack(Routes.MAIN, inclusive = false) },
+                onOpenEntry = { navController.navigate(Routes.BAMBU_ENTRY) }
+            )
+        }
+        composable(Routes.BAMBU_ENTRY) {
+            BambuEntryScreen(
+                viewModel = bambuViewModel,
+                onBack = { navController.popBackStack() },
+                onOpenManufacturerPicker = { navController.navigate(Routes.BAMBU_MANUFACTURER) },
+                onOpenMaterialPicker = { navController.navigate(Routes.BAMBU_MATERIAL) },
+                onOpenColorPicker = { navController.navigate(Routes.BAMBU_COLOR) }
+            )
+        }
+        composable(Routes.BAMBU_MANUFACTURER) {
+            BambuManufacturerPickerScreen(bambuViewModel, onBack = { navController.popBackStack() })
+        }
+        composable(Routes.BAMBU_MATERIAL) {
+            BambuMaterialPickerScreen(
+                viewModel = bambuViewModel,
+                onBack = { navController.popBackStack() },
+                onNeedsSubtype = { navController.navigate(Routes.BAMBU_SUBTYPE) }
+            )
+        }
+        composable(Routes.BAMBU_SUBTYPE) {
+            BambuSubtypePickerScreen(bambuViewModel, onBack = { navController.popBackStack() })
+        }
+        composable(Routes.BAMBU_COLOR) {
+            BambuColorPickerScreen(bambuViewModel, onBack = { navController.popBackStack() })
+        }
+
         // ---- Spoolman ----
         composable(Routes.SPOOLMAN_SUBMENU) {
             SpoolmanSubMenuScreen(
@@ -200,7 +254,7 @@ fun K9NavHost(
         }
 
         // ---- Settings ----
-              composable(Routes.SETTINGS) {
+        composable(Routes.SETTINGS) {
             SettingsMenuScreen(
                 prefs = prefs,
                 onBack = { navController.popBackStack(Routes.MAIN, inclusive = false) },
@@ -216,6 +270,9 @@ fun K9NavHost(
         }
         composable(Routes.SETTINGS_QIDI) {
             QidiConnectionScreen(prefs, onBack = { navController.popBackStack() })
+        }
+        composable(Routes.SETTINGS_BAMBU) {
+            BambuConnectionScreen(bambuViewModel, onBack = { navController.popBackStack() })
         }
         composable(Routes.SETTINGS_NFC_STATUS) {
             NfcStatusScreen(onBack = { navController.popBackStack() })
