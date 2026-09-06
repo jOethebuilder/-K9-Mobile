@@ -5,6 +5,14 @@ plugins {
 android {
     namespace = "com.joethebuilder.k9"
     compileSdk = 34
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
 
     applicationVariants.all {
         outputs.all {
