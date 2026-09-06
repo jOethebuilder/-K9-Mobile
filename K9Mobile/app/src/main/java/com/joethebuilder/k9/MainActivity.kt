@@ -17,6 +17,7 @@ import com.joethebuilder.k9.protocol.DetectedProtocol
 import com.joethebuilder.k9.ui.navigation.K9NavHost
 import com.joethebuilder.k9.ui.navigation.Routes
 import com.joethebuilder.k9.viewmodel.AnycubicViewModel
+import com.joethebuilder.k9.viewmodel.BambuViewModel
 import com.joethebuilder.k9.viewmodel.OpenSpoolViewModel
 import com.joethebuilder.k9.viewmodel.QidiViewModel
 
@@ -24,6 +25,11 @@ class OpenSpoolViewModelFactory(private val prefs: PrefsRepository) : ViewModelP
     @Suppress("UNCHECKED_CAST")
     override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T =
         OpenSpoolViewModel(prefs) as T
+}
+class BambuViewModelFactory(private val prefs: PrefsRepository) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T =
+        BambuViewModel(prefs) as T
 }
 
 class MainActivity : ComponentActivity() {
@@ -38,6 +44,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var qidiVm: QidiViewModel
     private lateinit var openSpoolVm: OpenSpoolViewModel
     private lateinit var anycubicVm: AnycubicViewModel
+    private lateinit var bambuVm: BambuViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +55,7 @@ class MainActivity : ComponentActivity() {
             qidiVm = viewModel()
             openSpoolVm = viewModel(factory = OpenSpoolViewModelFactory(prefs))
             anycubicVm = viewModel()
+            bambuVm = viewModel(factory = BambuViewModelFactory(prefs))
             val navController = rememberNavController()
 
             val backStackEntry by navController.currentBackStackEntryAsState()
@@ -60,6 +68,7 @@ class MainActivity : ComponentActivity() {
                         qidiViewModel = qidiVm,
                         openSpoolViewModel = openSpoolVm,
                         anycubicViewModel = anycubicVm,
+                        bambuViewModel = bambuVm,
                         prefs = prefs
                     )
                 }
@@ -115,6 +124,15 @@ class MainActivity : ComponentActivity() {
                     anycubicVm.onSubMenuTagDetected(result.tag, data)
                 }
             }
+            Routes.BAMBU_SUBMENU -> {
+    val isNtagFamily = result.protocol == DetectedProtocol.OPENSPOOL_U1 ||
+        result.protocol == DetectedProtocol.ANYCUBIC_ACE ||
+        result.protocol == DetectedProtocol.UNKNOWN_NTAG
+    if (isNtagFamily) {
+        val data = if (result.protocol == DetectedProtocol.OPENSPOOL_U1) result.openSpoolData else null
+        bambuVm.onSubMenuTagDetected(result.tag, data)
+    }
+}
             else -> {
                 // Not a sub-menu screen (entry/picker/settings) and nothing was
                 // armed — ignore the tap, same as firmware simply not polling
