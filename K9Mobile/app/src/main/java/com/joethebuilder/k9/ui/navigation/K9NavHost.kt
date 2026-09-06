@@ -36,6 +36,8 @@ import com.joethebuilder.k9.ui.screens.settings.U1ConnectionScreen
 import com.joethebuilder.k9.ui.screens.settings.QidiConnectionScreen
 import com.joethebuilder.k9.ui.screens.spoolman.SpoolmanSubMenuScreen
 import com.joethebuilder.k9.ui.screens.spoolman.FilamentManagerScreen
+import com.joethebuilder.k9.ui.screens.settings.HelpMenuScreen
+import com.joethebuilder.k9.ui.screens.settings.HelpDetailScreen
 import com.joethebuilder.k9.viewmodel.AnycubicViewModel
 import com.joethebuilder.k9.viewmodel.BambuViewModel
 import com.joethebuilder.k9.viewmodel.OpenSpoolViewModel
@@ -85,6 +87,8 @@ object Routes {
     const val SETTINGS_BAMBU = "settings_bambu"
     const val SETTINGS_NFC_STATUS = "settings_nfc_status"
     const val SETTINGS_APP_INFO = "settings_app_info"
+    const val SETTINGS_HELP = "settings_help"
+    const val SETTINGS_HELP_DETAIL = "settings_help_detail"
 
     /** Sub-menu routes are where MainActivity should engage per-protocol auto-scan. */
     val QIDI_MODE_ROUTES = setOf(QIDI_SUBMENU)
@@ -255,16 +259,18 @@ fun K9NavHost(
 
         // ---- Settings ----
         composable(Routes.SETTINGS) {
-            SettingsMenuScreen(
-                prefs = prefs,
-                onBack = { navController.popBackStack(Routes.MAIN, inclusive = false) },
-                onOpenU1Connection = { navController.navigate(Routes.SETTINGS_U1) },
-                onOpenQidiConnection = { navController.navigate(Routes.SETTINGS_QIDI) },
-                onOpenNfcStatus = { navController.navigate(Routes.SETTINGS_NFC_STATUS) },
-                onOpenFirmwareInfo = { navController.navigate(Routes.SETTINGS_APP_INFO) },
-                onFactoryResetDone = { navController.popBackStack(Routes.MAIN, inclusive = false) }
-            )
-        }
+    SettingsMenuScreen(
+        prefs = prefs,
+        onBack = { navController.popBackStack(Routes.MAIN, inclusive = false) },
+        onOpenU1Connection = { navController.navigate(Routes.SETTINGS_U1) },
+        onOpenQidiConnection = { navController.navigate(Routes.SETTINGS_QIDI) },
+        onOpenBambuConnection = { navController.navigate(Routes.SETTINGS_BAMBU) },
+        onOpenNfcStatus = { navController.navigate(Routes.SETTINGS_NFC_STATUS) },
+        onOpenFirmwareInfo = { navController.navigate(Routes.SETTINGS_APP_INFO) },
+        onOpenHelp = { navController.navigate(Routes.SETTINGS_HELP) },
+        onFactoryResetDone = { navController.popBackStack(Routes.MAIN, inclusive = false) }
+    )
+}
         composable(Routes.SETTINGS_U1) {
             U1ConnectionScreen(openSpoolViewModel, onBack = { navController.popBackStack() })
         }
@@ -280,5 +286,14 @@ fun K9NavHost(
         composable(Routes.SETTINGS_APP_INFO) {
             FirmwareInfoScreen(onBack = { navController.popBackStack() })
         }
+        composable(Routes.SETTINGS_HELP) {
+    HelpMenuScreen(
+        onBack = { navController.popBackStack() },
+        onOpenTopic = { navController.navigate(Routes.SETTINGS_HELP_DETAIL) }
+    )
+}
+       composable(Routes.SETTINGS_HELP_DETAIL) {
+    HelpDetailScreen(onBack = { navController.popBackStack() })
+}
     }
 }
