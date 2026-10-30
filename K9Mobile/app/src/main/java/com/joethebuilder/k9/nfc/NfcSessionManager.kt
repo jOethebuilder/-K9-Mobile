@@ -37,7 +37,6 @@ object NfcSessionManager {
     private val READER_FLAGS =
         NfcAdapter.FLAG_READER_NFC_A or
         NfcAdapter.FLAG_READER_NFC_B or
-        NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
 
     /**
      * @param mode restricts which detections are delivered — NONE means the
